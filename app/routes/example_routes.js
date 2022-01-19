@@ -97,14 +97,19 @@ router.patch('/products/:id', requireToken, removeBlanks, (req, res, next) => {
 
 // DESTROY
 // DELETE /products/5a7db6c74d55bc51bdf39793
+<<<<<<< HEAD
 router.delete('/examples/:id', requireToken, (req, res, next) => {
   Example.findById(req.params.id)
+=======
+router.delete('/products/:id', requireToken, (req, res, next) => {
+  Product.findById(req.params.id)
+>>>>>>> 6d99e05 (updated the DESTROY endpoint commit)
     .then(handle404)
-    .then(example => {
-      // throw an error if current user doesn't own `example`
-      requireOwnership(req, example)
-      // delete the example ONLY IF the above didn't throw
-      example.deleteOne()
+    .then(product => {
+      // throw an error if current user doesn't own `product`
+      requireOwnership(req, product)
+      // delete the product ONLY IF the above didn't throw
+      product.deleteOne()
     })
     // send back 204 and no content if the deletion succeeded
     .then(() => res.sendStatus(204))
