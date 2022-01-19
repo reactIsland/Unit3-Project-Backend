@@ -3,7 +3,11 @@ const express = require('express')
 // Passport docs: http://www.passportjs.org/docs/
 const passport = require('passport')
 
+<<<<<<< HEAD
 // pull in Mongoose model for products
+=======
+// pull in Mongoose model for examples
+>>>>>>> b8ca7da (Updated the routes along with the product schema)
 const Product = require('../models/product')
 
 // this is a collection of methods that help us detect situations when we need
@@ -97,13 +101,8 @@ router.patch('/products/:id', requireToken, removeBlanks, (req, res, next) => {
 
 // DESTROY
 // DELETE /products/5a7db6c74d55bc51bdf39793
-<<<<<<< HEAD
-router.delete('/examples/:id', requireToken, (req, res, next) => {
-  Example.findById(req.params.id)
-=======
 router.delete('/products/:id', requireToken, (req, res, next) => {
   Product.findById(req.params.id)
->>>>>>> 6d99e05 (updated the DESTROY endpoint commit)
     .then(handle404)
     .then(product => {
       // throw an error if current user doesn't own `product`
