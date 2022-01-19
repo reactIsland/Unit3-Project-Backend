@@ -56,15 +56,15 @@ router.get('/examples/:id', requireToken, (req, res, next) => {
 })
 
 // CREATE
-// POST /examples
-router.post('/examples', requireToken, (req, res, next) => {
+// POST /products
+router.post('/products', requireToken, (req, res, next) => {
   // set owner of new example to be current user
-  req.body.example.owner = req.user.id
+  req.body.product.owner = req.user.id
 
-  Example.create(req.body.example)
-    // respond to succesful `create` with status 201 and JSON of new "example"
-    .then(example => {
-      res.status(201).json({ example: example.toObject() })
+  Product.create(req.body.product)
+    // respond to succesful `create` with status 201 and JSON of new "product"
+    .then(product => {
+      res.status(201).json({ product: product.toObject() })
     })
     // if an error occurs, pass it off to our error handler
     // the error handler needs the error message and the `res` object so that it
@@ -73,21 +73,21 @@ router.post('/examples', requireToken, (req, res, next) => {
 })
 
 // UPDATE
-// PATCH /examples/5a7db6c74d55bc51bdf39793
-router.patch('/examples/:id', requireToken, removeBlanks, (req, res, next) => {
+// PATCH /products/5a7db6c74d55bc51bdf39793
+router.patch('/products/:id', requireToken, removeBlanks, (req, res, next) => {
   // if the client attempts to change the `owner` property by including a new
   // owner, prevent that by deleting that key/value pair
-  delete req.body.example.owner
+  delete req.body.product.owner
 
-  Example.findById(req.params.id)
+  Product.findById(req.params.id)
     .then(handle404)
-    .then(example => {
+    .then(product => {
       // pass the `req` object and the Mongoose record to `requireOwnership`
       // it will throw an error if the current user isn't the owner
-      requireOwnership(req, example)
+      requireOwnership(req, product)
 
       // pass the result of Mongoose's `.update` to the next `.then`
-      return example.updateOne(req.body.example)
+      return product.updateOne(req.body.product)
     })
     // if that succeeded, return 204 and no JSON
     .then(() => res.sendStatus(204))
@@ -96,7 +96,7 @@ router.patch('/examples/:id', requireToken, removeBlanks, (req, res, next) => {
 })
 
 // DESTROY
-// DELETE /examples/5a7db6c74d55bc51bdf39793
+// DELETE /products/5a7db6c74d55bc51bdf39793
 router.delete('/examples/:id', requireToken, (req, res, next) => {
   Example.findById(req.params.id)
     .then(handle404)
