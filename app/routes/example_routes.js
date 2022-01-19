@@ -90,7 +90,7 @@ router.patch('/products/:id', requireToken, removeBlanks, (req, res, next) => {
       return product.updateOne(req.body.product)
     })
     // if that succeeded, return 204 and no JSON
-    .then(() => res.sendStatus(204))
+    .then(product => res.sendStatus(204).json({ product }))
     // if an error occurs, pass it to the handler
     .catch(next)
 })
