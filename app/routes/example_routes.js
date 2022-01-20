@@ -3,11 +3,7 @@ const express = require('express')
 // Passport docs: http://www.passportjs.org/docs/
 const passport = require('passport')
 
-<<<<<<< HEAD
-// pull in Mongoose model for products
-=======
 // pull in Mongoose model for examples
->>>>>>> b8ca7da (Updated the routes along with the product schema)
 const Product = require('../models/product')
 
 // this is a collection of methods that help us detect situations when we need
