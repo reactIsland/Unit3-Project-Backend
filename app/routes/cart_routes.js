@@ -54,22 +54,37 @@ router.post('/cart/add/:id', requireToken, async (req, res, next) => {
 
 
 // Remove item from cart - Kian
-router.delete('/cart/:id', requireToken, async (req, res, next) => {
-    // find the userID
-    let userId = req.user.id
-    // find the user
-    let user = await User.findById(userId)
-    // find product ID
+// router.delete('/cart/:id', requireToken, async (req, res, next) => {
+//     // find the userID
+//     let userId = req.user.id
+//     // find the user
+//     let user = await User.findById(userId)
+//     // find product ID
+//     let productId = req.params.id
+//     // remove cartItem
+//     let updatedCart = user.cart.filter(cartItem => cartItem._id === productId)
+//     //filter return a new arr
+//     user.cart = updatedCart
+//     //save the update to user doc
+//     await user.save()
+//     //send user's cart back to front end
+//     res.json(user.cart)
+//   })
+
+  router.delete('/cart/:id', requireToken, (req, res, next) => {
     let productId = req.params.id
-    // isolate the cart
-    let cart = user.cart
-    // iterate through array with conditional
-    const newCart = cart.filter(cartItem => cartItem.id === productId)
-    // update database
-    cart = newCart
-    await user.save()
-    // send cart
-    res.json({ cart })
+    let userId = req.user.id
+
+    User.findById(userId)
+      .then( user => {
+          let cart = user.cart
+          let updatedCart = cart.filter(cartItem => cartItem._id != productId ) 
+          user.cart = updatedCart
+          return user.save()
+      })
+      .then(user => {
+          res.json({ user })
+      })
   })
 
 // Get all cart items - Kian
@@ -103,6 +118,8 @@ router.delete('/cart/clear', requireToken, async (req, res, next) => {
     await user.save()
 
     res.json({ user })
+
+    //this is sending back an empty cart but not deleting items from cart bd on user
 })
 
 module.exports = router

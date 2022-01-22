@@ -28,8 +28,8 @@ const requireToken = passport.authenticate('bearer', { session: false })
 const router = express.Router()
 
 // INDEX
-// GET /product
-router.get('/product', requireToken, (req, res, next) => {
+// GET all products
+router.get('/products', (req, res, next) => {
   Product.find()
     .then(products => {
       // `products` will be an array of Mongoose documents

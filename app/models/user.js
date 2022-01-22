@@ -6,10 +6,7 @@ const userSchema = new mongoose.Schema({
     required: true,
     unique: true
   },
-  cart: {
-    type: Array, 
-    required: false
-  },
+  cart: [],
   hashedPassword: {
     type: String,
     required: true
