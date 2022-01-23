@@ -52,40 +52,21 @@ router.post('/cart/add/:id', requireToken, async (req, res, next) => {
     res.json(user.cart)
 })
 
+router.delete('/cart/:id', requireToken, async (req, res, next) => {
+  let productId = req.params.id
+  let userId = req.user.id
 
-// Remove item from cart - Kian
-// router.delete('/cart/:id', requireToken, async (req, res, next) => {
-//     // find the userID
-//     let userId = req.user.id
-//     // find the user
-//     let user = await User.findById(userId)
-//     // find product ID
-//     let productId = req.params.id
-//     // remove cartItem
-//     let updatedCart = user.cart.filter(cartItem => cartItem._id === productId)
-//     //filter return a new arr
-//     user.cart = updatedCart
-//     //save the update to user doc
-//     await user.save()
-//     //send user's cart back to front end
-//     res.json(user.cart)
-//   })
+  let user = await User.findById(userId)
+  let cart = user.cart
 
-  router.delete('/cart/:id', requireToken, (req, res, next) => {
-    let productId = req.params.id
-    let userId = req.user.id
+  let updatedCart = cart.filter(cartItem => cartItem._id != productId ) 
+        
+  user.cart = updatedCart
+        
+  await user.save()
+  res.json({ user })
 
-    User.findById(userId)
-      .then( user => {
-          let cart = user.cart
-          let updatedCart = cart.filter(cartItem => cartItem._id != productId ) 
-          user.cart = updatedCart
-          return user.save()
-      })
-      .then(user => {
-          res.json({ user })
-      })
-  })
+})
 
 // Get all cart items - Kian
 router.get('/cart', requireToken, async (req, res, next) => {
@@ -99,27 +80,16 @@ router.get('/cart', requireToken, async (req, res, next) => {
     res.json({ cart })
   })
 
-// Remove all items - useful if customer clears cart or buys everything and we wish to clear the cart anyhow. 
-router.delete('/cart/clear', requireToken, async (req, res, next) => {
-    // grab the user id
-    // use the user id to find the user
-    // isolate the cart 
-    // remove all items from cart 
-    // update database cart 
-    // send back a 204 status and the user with the empty cart  
+// Remove all items - useful if customer clears cart or buys everything and we wish to clear the cart. 
+router.delete('/clearall', requireToken, async (req, res, next) => {
     let userId = req.user.id
     let user = await User.findById(userId) 
-    let cart = user.cart
+    user.cart = []
     
-    while (cart.length) {
-      cart.pop()
-    }
-
     await user.save()
 
     res.json({ user })
 
-    //this is sending back an empty cart but not deleting items from cart bd on user
 })
 
 module.exports = router
