@@ -26,6 +26,9 @@ const productSchema = mongoose.Schema(
     category: {
       type: String,
       required: true
+    },
+    photo: {
+      type: String
     }
   }, {
     timestamps: true
