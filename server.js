@@ -7,6 +7,7 @@ const cors = require('cors')
 const productRoutes = require('./app/routes/product_routes')
 const userRoutes = require('./app/routes/user_routes')
 const cartRoutes = require('./app/routes/cart_routes')
+const stripeRoutes = require('./app/routes/stripe_routes')
 
 // require middleware
 const errorHandler = require('./lib/error_handler')
@@ -60,6 +61,7 @@ app.use(requestLogger)
 app.use(productRoutes)
 app.use(userRoutes)
 app.use(cartRoutes)
+app.use(stripeRoutes)
 
 // register error handling middleware
 // note that this comes after the route middlewares, because it needs to be
