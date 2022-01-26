@@ -26,12 +26,17 @@ We initially planned to make this app into an E-commerce where Produce owners an
 
 ### Technologies Used
 
-- Javascript (React)
+- Javascript
+- React
+- Stripe
+- Axios
+- Bootstrap
 - MongoDb
 - Mongoose
 - Express
-- HTML
+- JSX
 - CSS
+- Styled-Components
 
 ### Unsolved Problems
 
