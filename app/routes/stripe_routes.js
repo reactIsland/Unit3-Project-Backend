@@ -39,40 +39,29 @@ router.post('/create-checkout-session', requireToken, async (req, res) => {
         line_items: transformedItems,
         mode: 'payment', 
         success_url: `${process.env.CLIENT_URL}/success`, 
-        cancel_url: `${process.env.CLIENT_URL}/cancel`
+        cancel_url: `${process.env.CLIENT_URL}/Home`
     });
-     
     res.json({ session })
   });
 
   //Get customer object 
   router.get('/customer', requireToken, async (req, res, next) => {
     let user = await User.findById(req.user._id)
-
-    try {
-      const customer = await stripe.customers.retrieve(
-        'cus_L1poHwHcHi0zoj'
-      );
-    } catch(e) {
-      res.status(500).json({ error: e.message })
-    }
-    res.json({ customer: customer })
-  })
-
-  //Get all orders 
-  router.get('/orders', requireToken, async (req, res, next) => {
-    let user = await User.findById(req.user._id)
     
-    try {
-      const orders = await stripe.orders.list({
-        customer: 'cus_L1poHwHcHi0zoj',
-      })
-      res.json({ orders: orders })
-    } catch(e) {
-      res.status(500).json({ error: e.message })
-    }
+    const customer = await stripe.customers.retrieve(user.stripeId);
+    
+    res.json({ customer })
   })
 
+  //Get PaymentIntents (ie. past orders)
+  router.get('/payments', requireToken, async (req, res, next) => {
+    let user = await User.findById(req.user._id)
 
+    const paymentIntents = await stripe.paymentIntents.list({
+      customer: user.stripeId,
+    });
+
+    res.json({ paymentIntents })
+  })
 
 module.exports = router
