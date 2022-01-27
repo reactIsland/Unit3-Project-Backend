@@ -5,49 +5,89 @@ const requireToken = passport.authenticate('bearer', { session: false })
 const router = express.Router()
 
 require('dotenv').config()
-// Put key in .env file 
 const stripeKey = process.env.STRIPE_PRIVATE_KEY
-
 const stripe = require('stripe')(stripeKey);
-// This example sets up an endpoint using the Express framework.
-// Watch this video to get started: https://youtu.be/rPR2aJ6XnAc.
+
+
+const createCustomer = async (id) => {
+  const customer = await stripe.customers.create({
+    description: 'My First Test Customer (created for API docs)',
+  });
+  let customerID = customer.id
+  let user = await User.findById(id)
+  user.stripeId = customerID
+  user.save()
+}
 
 router.post('/create-checkout-session', requireToken, async (req, res) => {
     // find the user to get their cart
     let user = await User.findById(req.user._id)
     let userCart = user.cart
-    console.log(user)
-    console.log(userCart)
 
-    // calculate the users cart 
+    createCustomer(user._id)
+
+  // transform cart items into format that stripe needs
+  const transformedItems = userCart.map((item) => ({
+    price_data: {
+      currency: 'usd',
+      product_data: {
+        name: item.name
+      },
+      unit_amount: item.price * 100
+    },
+    description: item.description,
+    quantity: 1
+  }))
 
     // send all necessary cart stuff to session stripe object
-    try {
-        const session = await stripe.checkout.sessions.create({
-            payment_method_types: ['card'], 
-            mode: 'payment', 
-            line_items: userCart.map(item => {
-                return {
-                    price_data: {
-                        currency: 'usd', 
-                        product_data: {
-                            name: item.name
-                        },
-                        unit_amount: item.price
-                    }, 
-                    quantity: 1
-                }
-            }),
-            success_url: `${process.env.CLIENT_URL}/success`, 
-            cancel_url: `${process.env.CLIENT_URL}/cancel`
-        });
-        res.json({ url: session.url })
-    } catch(e) {
-        res.status(500).json({ error: e.message })
-    }
-    res.redirect(303, session.url);
+    let session = await stripe.checkout.sessions.create({
+        payment_method_types: ['card'], 
+        line_items: transformedItems,
+        mode: 'payment', 
+        success_url: `${process.env.SERVER_URL}/${user._id}/success`, 
+        cancel_url: `${process.env.CLIENT_URL}/Home`
+    });
+
+    res.json({ session })
   });
 
+  //Get customer object
+  router.get('/customer', requireToken, async (req, res, next) => {
+    let user = await User.findById(req.user._id)
 
+    const { stripeId } = user
+  
+    const customer = await stripe.customers.retrieve(stripeId);
+  
+    res.json({ customer })
+  })
+
+  //Get PaymentIntents (id what this does lol)
+  router.get('/payments', requireToken, async (req, res, next) => {
+    let user = await User.findById(req.user._id)
+    const paymentIntents = await stripe.paymentIntents.list({
+      customer: user.stripeId,
+    });
+    const { data } = paymentIntents
+    res.json({ data })
+  })
+
+  router.get('/orders', requireToken, async (req, res, next) => {
+    let user = await User.findById(req.user._id)
+    res.json({ user })
+  })
+
+  router.get('/:id/success', async (req, res, next) => {
+    let id = req.params.id
+    let user = await User.findById(id)
+
+    const userCart = user.cart
+  
+    user.orders = userCart
+    user.cart = []
+    user.save()
+
+    res.redirect(`${process.env.CLIENT_URL}/success`)
+  })
 
 module.exports = router

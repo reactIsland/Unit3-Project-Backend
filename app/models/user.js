@@ -7,9 +7,14 @@ const userSchema = new mongoose.Schema({
     unique: true
   },
   cart: [],
+  orders: [],
   hashedPassword: {
     type: String,
     required: true
+  },
+  stripeId: {
+    type: String, 
+    required: false
   },
   token: String
 }, {
