@@ -19,7 +19,7 @@ const productSchema = mongoose.Schema(
       type: String,
       required: true
     },
-    priceInCents: {
+    price: {
       type: Number,
       required: true
     },
