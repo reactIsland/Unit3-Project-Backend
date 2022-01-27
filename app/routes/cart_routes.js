@@ -50,6 +50,22 @@ router.post('/cart/add/:id', requireToken, async (req, res, next) => {
 })
 
 router.delete('/cart/:id', requireToken, async (req, res, next) => {
+  let totalCartCost 
+  const calculateCartTotal = (cart) => {
+    console.log(cart)
+    let prices = []
+    cart.forEach(cartItem => {
+       prices.push(cartItem.price)
+    });
+    console.log(prices)
+    const reducer = (previousValue, currentValue) => previousValue + currentValue;
+
+    if (prices.length) {
+      let sum = prices.reduce(reducer)
+      totalCartCost = sum
+    }
+  }
+
   let productId = req.params.id
   let userId = req.user.id
 
@@ -60,23 +76,42 @@ router.delete('/cart/:id', requireToken, async (req, res, next) => {
 
   user.cart = updatedCart
 
+  calculateCartTotal(updatedCart)
+        
   await user.save()
-  res.json({ user })
+  res.json({ user, totalCartCost })
+
 })
 
 // Get all cart items - Kian
 router.get('/cart', requireToken, async (req, res, next) => {
-  // find the userID
-  let userId = req.user.id
-  // find the user
-  let user = await User.findById(userId)
-  // isolate the user.cart
-  let cart = user.cart
-  // send cart back to the frontend
-  res.json({ cart })
-})
+    let totalCartCost 
+    const calculateCartTotal = (cart) => {
+    
+      let prices = []
+      cart.forEach(cartItem => {
+         prices.push(cartItem.price)
+      });
+    
+      const reducer = (previousValue, currentValue) => previousValue + currentValue;
+      if (prices.length) {
+        let sum = prices.reduce(reducer)
+        totalCartCost = sum
+      }
+    }
+    // find the userID
+    let userId = req.user.id
+    // find the user
+    let user = await User.findById(userId)
+    // isolate the user.cart
+    let cart = user.cart
 
-// Remove all items - useful if customer clears cart or buys everything and we wish to clear the cart.
+    calculateCartTotal(cart)
+    
+    res.json({ cart, totalCartCost })
+  })
+
+// Remove all items - useful if customer clears cart or buys everything and we wish to clear the cart. 
 router.delete('/clearall', requireToken, async (req, res, next) => {
   let userId = req.user.id
   let user = await User.findById(userId)
