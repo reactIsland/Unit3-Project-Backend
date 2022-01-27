@@ -44,8 +44,8 @@ router.post('/create-checkout-session', requireToken, async (req, res) => {
         payment_method_types: ['card'], 
         line_items: transformedItems,
         mode: 'payment', 
-        success_url: `${process.env.SERVER_URL}/${user._id}/success`, 
-        cancel_url: `${process.env.CLIENT_URL}/Home`
+        success_url: `${process.env.DEPLOYED_BACKEND_URL}/${user._id}/success`, 
+        cancel_url: `${process.env.DEPLOYED_FRONTEND_URL}/Home`
     });
 
     res.json({ session })
@@ -87,7 +87,7 @@ router.post('/create-checkout-session', requireToken, async (req, res) => {
     user.cart = []
     user.save()
 
-    res.redirect(`${process.env.CLIENT_URL}/success`)
+    res.redirect(`${process.env.DEPLOYED_FRONTEND_URL}/success`)
   })
 
 module.exports = router
