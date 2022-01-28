@@ -52,12 +52,10 @@ router.post('/cart/add/:id', requireToken, async (req, res, next) => {
 router.delete('/cart/:id', requireToken, async (req, res, next) => {
   let totalCartCost 
   const calculateCartTotal = (cart) => {
-    console.log(cart)
     let prices = []
     cart.forEach(cartItem => {
        prices.push(cartItem.price)
     });
-    console.log(prices)
     const reducer = (previousValue, currentValue) => previousValue + currentValue;
 
     if (prices.length) {
